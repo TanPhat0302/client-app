@@ -23,6 +23,7 @@ interface Props {
 }
 
 export default observer (function ActivityDetailedHeader({activity}: Props) {
+    console.log("Activity:", activity);
     return (
         <Segment.Group>
             <Segment basic attached='top' style={{padding: '0'}}>
@@ -38,7 +39,7 @@ export default observer (function ActivityDetailedHeader({activity}: Props) {
                                 />
                                 <p>{format(activity.date!,'dd MMM yyyy')}</p>
                                 <p>
-                                    Hosted by <strong>Bob</strong>
+                                    Hosted by {activity.host?.displayName}
                                 </p>
                             </Item.Content>
                         </Item>

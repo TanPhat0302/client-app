@@ -1,10 +1,11 @@
 import axios, { AxiosError, AxiosResponse } from 'axios'
-import { Activity } from '../models/activity';
-import { resolve } from 'path';
+import { Activity, ActivityFormValues } from '../models/activity';
 import { toast } from 'react-toastify';
 import { router } from '../router/Routes';
 import { store } from '../stores/store';
 import { User, UserFormValues } from '../models/user';
+import { Photo, Profile } from '../models/profile';
+import { request } from 'http';
 
 const sleep = (delay: number) => {
     return new Promise((resolve) => {
@@ -77,9 +78,10 @@ const requests = {
 const Activities = {
     list: () => requests.get<Activity[]>('/activities'),
     details: (id: string) => requests.get<Activity>(`/activities/${id}`),
-    create: (activities: Activity) => axios.post<void>('/activities', activities),
-    update: (activity: Activity) => axios.put<void>(`/activities/${activity.id}`, activity),
-    delete: (id: string) => axios.delete<void>(`/activities/${id}`)
+    create: (activity: ActivityFormValues) => requests.post<void>('/activities', activity),
+    update: (activity: ActivityFormValues) => requests.put<void>(`/activities/${activity.id}`, activity),
+    delete: (id: string) => requests.del<void>(`/activities/${id}`),
+    attend: (id: string) => requests.post<void>(`/activities/${id}/attend`,{})
 
 }
 
@@ -90,9 +92,23 @@ const Account ={
     register: (user: UserFormValues) => requests.post<User>('/account/register', user)
 }
 
+const Profiles = {
+    get: (username: string) => requests.get<Profile>(`/profiles/${username}`),
+    uploadPhoto: (file: any) => {
+        let formData = new FormData();
+        formData.append('File', file);
+        return axios.post<Photo>('photos', formData, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+        })
+    },
+    setMainPhoto: (id: string) => axios.post(`/photos/${id}/setMain`, {}),
+    deletePhoto: (id: string) => axios.delete(`/photos/${id}`),
+}
+
 const agent = {
     Activities,
-    Account
+    Account,
+    Profiles
 }
 
 export default agent;

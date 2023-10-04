@@ -61,13 +61,14 @@ export default observer(function ProfilePhoto({ profile }: Props) {
 
                                             />
                                             <Button
-                                                basic color='red'
-                                                icon='trash'
-                                                loading={target === photo.id && loading}
-                                                onClick={e => handleDeletePhoto(photo,e)}
-                                                disabled={photo.isMain}
                                                 name={photo.id}
-                                            />
+                                                loading={loading && photo.id === target}
+                                                onClick={(e) => handleDeletePhoto(photo, e)}
+                                                basic
+                                                color='red'
+                                                icon='trash'
+                                                disabled={photo.isMain}
+                                                 />
                                         </Button.Group>
                                     )}
                                 </Card>

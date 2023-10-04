@@ -17,6 +17,7 @@ export default class UserStore{
     }
 
     login = async (creds: UserFormValues) =>{
+        window.location.reload();
         try {
             const user = await agent.Account.login(creds);
             store.commonStore.setToken(user.token);
@@ -67,4 +68,8 @@ export default class UserStore{
         
 
     }
+
+    setDisplayName = (name: string) => {
+        if (this.user) this.user.displayName = name;
+       }
 }

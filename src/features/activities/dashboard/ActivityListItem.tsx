@@ -11,7 +11,6 @@ interface Props {
 }
 export default function ActivityListItem({ activity }: Props) {
 
-    console.log("Activity:", activity.host?.displayName);
     const { activityStore } = useStore();
     const { deleteActivity } = activityStore;
 

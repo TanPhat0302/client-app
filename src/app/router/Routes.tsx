@@ -11,6 +11,7 @@ import ServerError from "../../features/errors/ServerError";
 import LoginForm from "../../features/users/LoginForm";
 import ProfilePage from "../../features/profiles/ProfilePage";
 
+
 export const routes: RouteObject[] = [
     {
         path: "/",
@@ -26,6 +27,7 @@ export const routes: RouteObject[] = [
             {path:'not-found', element: <NotFound />},
             {path:'server-error', element: <ServerError />},
             {path:'*', element: <Navigate replace to='/not-found' />},
+            
         ]
 
     },

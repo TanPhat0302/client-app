@@ -1,37 +1,40 @@
 import { makeAutoObservable, reaction, runInAction } from "mobx";
-import { Photo, Profile } from "../models/profile";
+import { Photo, Profile, UserActivity } from "../models/profile";
 import agent from "../api/agent";
 import { store } from "./store";
 
 export default class ProfileStore {
+    currentUserProfile: Profile | null = null;
     profile: Profile | null = null;
     loadingProfile = false;
     uploading = false;
     loading = false;
     followings: Profile[] = [];
     loadingFollowings = false;
-    activeTab = 0;
+    activeTab: number = 0;
+    userActivities: UserActivity[] = [];
+    loadingActivities = false;
 
     constructor() {
         makeAutoObservable(this);
-        
+
         reaction(
             () => this.activeTab,
-            activeTab =>{
-                if (activeTab === 3 || activeTab === 4){
+            activeTab => {
+                if (activeTab === 3 || activeTab === 4) {
 
                     const predicate = activeTab === 3 ? 'followers' : 'following';
                     this.loadFollowings(predicate);
                 } else {
-                    this.followings =[];
+                    this.followings = [];
                 }
-                
+
             }
-           
+
         )
     }
-    
-    setActiveTab =(activeTab: number) =>{
+
+    setActiveTab = (activeTab: number) => {
         this.activeTab = activeTab;
     }
 
@@ -122,18 +125,18 @@ export default class ProfileStore {
     updateProfile = async (profile: Partial<Profile>) => {
         this.loading = true;
         try {
-        await agent.Profiles.updateProfile(profile);
-        runInAction(() => {
-        if (profile.displayName && profile.displayName !==
-       store.userStore.user?.displayName) {
-        store.userStore.setDisplayName(profile.displayName);
-        }
-        this.profile = {...this.profile, ...profile as Profile};
-        this.loading = false;
-        })
+            await agent.Profiles.updateProfile(profile);
+            runInAction(() => {
+                if (profile.displayName && profile.displayName !==
+                    store.userStore.user?.displayName) {
+                    store.userStore.setDisplayName(profile.displayName);
+                }
+                this.profile = { ...this.profile, ...profile as Profile };
+                this.loading = false;
+            })
         } catch (error) {
-        console.log(error);
-        runInAction(() => this.loading = false);
+            console.log(error);
+            runInAction(() => this.loading = false);
         }
     }
 
@@ -145,7 +148,7 @@ export default class ProfileStore {
             runInAction(() => {
                 if (this.profile
                     && this.profile.username !== store.userStore.user?.username
-                    && this.profile.username !== username ) {
+                    && this.profile.username !== username) {
                     following ? this.profile.followersCount++ : this.profile.followersCount--;
                     this.profile.following = !this.profile.following;
                 }
@@ -177,6 +180,23 @@ export default class ProfileStore {
         } catch (error) {
             console.log(error);
             runInAction(() => this.loadingFollowings = false);
+        }
+    }
+
+    loadUserActivities = async (username: string, predicate?: string) => {
+        this.loadingActivities = true;
+        try {
+            const activities = await agent.Profiles.listActivities(username,
+                predicate!);
+            runInAction(() => {
+                this.userActivities = activities;
+                this.loadingActivities = false;
+            })
+        } catch (error) {
+            console.log(error);
+            runInAction(() => {
+                this.loadingActivities = false;
+            })
         }
     }
 
